@@ -594,6 +594,8 @@ else if (typeof exports === 'object'){
       <div class="secondary-toolbar">
         <button id="clearBtn">Clear editor</button>
         <button id="downloadBtn">Download .sqlite</button>
+        <button id="uploadBtn">Upload .sqlite</button>
+        <input type="file" id="uploadInput" accept=".sqlite,.sqlite3,.db" style="display:none">
         <button class="danger" id="resetBtn">Reset database</button>
       </div>
     </div>
@@ -742,6 +744,8 @@ else if (typeof exports === 'object'){
   const runBtn = document.getElementById('runBtn');
   const clearBtn = document.getElementById('clearBtn');
   const downloadBtn = document.getElementById('downloadBtn');
+  const uploadBtn = document.getElementById('uploadBtn');
+  const uploadInput = document.getElementById('uploadInput');
   const resetBtn = document.getElementById('resetBtn');
   const resultsEl = document.getElementById('results');
   const tableListEl = document.getElementById('tableList');
@@ -950,6 +954,52 @@ else if (typeof exports === 'object'){
     a.click();
     URL.revokeObjectURL(url);
   };
+
+  uploadBtn.onclick = () => {
+    uploadInput.value = ''; // allow re-selecting the same filename twice in a row
+    uploadInput.click();
+  };
+
+  uploadInput.addEventListener('change', async () => {
+    const file = uploadInput.files && uploadInput.files[0];
+    if (!file) return;
+
+    if (!confirm(`Import "${file.name}"? This will replace everything in your current practice database on this device.`)) {
+      uploadInput.value = '';
+      return;
+    }
+
+    try {
+      const buf = await file.arrayBuffer();
+      const bytes = new Uint8Array(buf);
+
+      // Validate it's actually openable as a SQLite db before touching anything live.
+      let newDb;
+      try {
+        newDb = new SQL.Database(bytes);
+        // Touch it with a real query so a garbage/non-sqlite file fails now, not later.
+        newDb.exec("SELECT name FROM sqlite_master LIMIT 1;");
+      } catch (parseErr) {
+        console.error('invalid sqlite file', parseErr);
+        alert('That file could not be opened as a SQLite database. Nothing was changed.');
+        uploadInput.value = '';
+        return;
+      }
+
+      // Only swap the live db and persist once we know the file is valid.
+      if (db) db.close();
+      db = newDb;
+      await saveDb();
+      refreshTableList();
+      resultsEl.innerHTML = '<div class="empty-state">Database imported. Write a query above and hit Run.</div>';
+      statusText.textContent = `Imported ${file.name}`;
+    } catch (e) {
+      console.error('upload error', e);
+      alert('Could not read that file. Nothing was changed.');
+    } finally {
+      uploadInput.value = '';
+    }
+  });
 
   init();
 })();
