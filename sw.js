@@ -7,7 +7,7 @@
 // IMPORTANT: bump CACHE_NAME any time index.html changes and gets
 // re-deployed, so returning visitors actually pick up the new version
 // instead of being stuck on a stale cached copy forever.
-const CACHE_NAME = 'sql-practice-v3';
+const CACHE_NAME = 'sql-practice-v4';
 const APP_SHELL = [
   './',
   './index.html',
