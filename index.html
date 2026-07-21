@@ -275,9 +275,24 @@ else if (typeof exports === 'object'){
     flex-direction: row;
   }
   @media (max-width: 720px) {
-    main { flex-direction: column; }
-    #sidebar { width: 100% !important; max-height: 160px; border-right: none !important; border-bottom: 1px solid var(--border-soft); }
+  main { flex-direction: column; }
+  #sidebar { width: 100% !important; max-height: 160px; border-right: none !important; border-bottom: 1px solid var(--border-soft); }
+
+  /* Mobile normal mode only (fullscreen editor mode is untouched):
+     stop squeezing editor + results into one fixed screen height —
+     let the page scroll naturally and give the table real room. */
+  html, body { height: auto; }
+  body:not(.fs-active) main,
+  body:not(.fs-active) #content { min-height: 0; flex: 1 1 auto; overflow: visible; }
+  body:not(.fs-active) .editor-area { max-height: 32vh; }
+  body:not(.fs-active) #results {
+    flex: none;
+    min-height: 55vh;
+    max-height: none;
+    overflow-x: auto;
+    overflow-y: visible;
   }
+}
   body.fs-active header,
   body.fs-active #sidebar { display: none !important; }
   #sidebar {
