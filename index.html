@@ -897,6 +897,10 @@ else if (typeof exports === 'object'){
 
   async function init() {
     try {
+      if (navigator.storage && navigator.storage.persist) {
+        navigator.storage.persist().catch(() => {});
+      }
+
       SQL = await initSqlJs({
         locateFile: f => (f.endsWith('.wasm') ? 'data:application/wasm;base64,' + window.__SQL_WASM_B64__ : f)
       });
