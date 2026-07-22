@@ -229,14 +229,7 @@ else if (typeof exports === 'object'){
     --mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
   }
   * { box-sizing: border-box; }
-  html, body { height: 100%; overflow: hidden; }
-  /* Mobile browsers report 100% as the tallest the viewport can ever be (toolbar
-     collapsed), which left the app taller than what's actually visible and made
-     the whole page scroll instead of just the results panel. 100dvh tracks the
-     real visible height as the browser UI shows/hides. */
-  @supports (height: 100dvh) {
-    html, body { height: 100dvh; }
-  }
+  html, body { height: 100%; }
   body {
     margin: 0;
     background: var(--bg);
@@ -283,15 +276,7 @@ else if (typeof exports === 'object'){
   }
   @media (max-width: 720px) {
     main { flex-direction: column; }
-    #sidebar { width: 100% !important; max-height: 120px; border-right: none !important; border-bottom: 1px solid var(--border-soft); }
-    /* The editor used to claim a 220px floor plus up to 60vh, leaving barely
-       any space for results underneath on a phone screen. Cap it smaller by
-       default so results get the majority of the vertical space. */
-    .editor-area { min-height: 140px; max-height: 32vh; }
-    #editor-wrap { padding: 10px; }
-    .secondary-toolbar button { padding: 7px 10px; font-size: 12px; }
-    #results { min-height: 0; -webkit-overflow-scrolling: touch; }
-    table.result-table th, table.result-table td { padding: 6px 8px; font-size: 12.5px; }
+    #sidebar { width: 100% !important; max-height: 160px; border-right: none !important; border-bottom: 1px solid var(--border-soft); }
   }
   body.fs-active header,
   body.fs-active #sidebar { display: none !important; }
@@ -301,8 +286,6 @@ else if (typeof exports === 'object'){
     border-right: 1px solid var(--border-soft);
     background: var(--sidebar);
     overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
     padding: 10px;
   }
   #sidebar h2 {
@@ -472,8 +455,6 @@ else if (typeof exports === 'object'){
     line-height: 21px;
     outline: none;
     overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
     white-space: pre;
     tab-size: 2;
   }
@@ -517,10 +498,7 @@ else if (typeof exports === 'object'){
   button.danger:hover { border-color: var(--bad); color: var(--bad); }
   #results {
     flex: 1;
-    min-height: 0;
     overflow: auto;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
     padding: 12px;
   }
   .msg {
@@ -556,9 +534,6 @@ else if (typeof exports === 'object'){
     color: #f8fafc;
     font-weight: 700;
     letter-spacing: .02em;
-    position: sticky;
-    top: 0;
-    z-index: 1;
   }
   table.result-table td { color: var(--code); }
   table.result-table tr:nth-child(even) td { background: rgba(255,255,255,.02); }
