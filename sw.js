@@ -7,7 +7,7 @@
 // IMPORTANT: bump CACHE_NAME any time index.html changes and gets
 // re-deployed, so returning visitors actually pick up the new version
 // instead of being stuck on a stale cached copy forever.
-const CACHE_NAME = 'sql-practice-v7';
+const CACHE_NAME = 'sql-practice-v8';
 const APP_SHELL = [
   './',
   './index.html',
@@ -33,10 +33,30 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Cache-first: serve instantly from cache when offline, but also fetch
-// a fresh copy in the background when online so the cache stays current.
+// Navigation requests (the HTML page itself): network-first, so anyone
+// online always gets the latest deploy immediately, no waiting for a
+// background revalidation to catch up on a future visit. Falls back to
+// cache only when offline.
+//
+// Everything else (icons, manifest): cache-first, since those don't change
+// between deploys and instant-from-cache is fine for them.
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
+
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+          }
+          return response;
+        })
+        .catch(() => caches.match(event.request).then((cached) => cached || caches.match('./index.html')))
+    );
+    return;
+  }
 
   event.respondWith(
     caches.match(event.request).then((cached) => {
